@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Format Converter</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div class="topbar">
+      <span class="brand"><span class="logo" aria-hidden="true"></span>Convertly</span>
+      <button type="button" id="themeBtn" class="ghost" aria-label="Switch light or dark theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <span id="themeLabel">Theme</span>
+      </button>
+    </div>
+    <p class="eyebrow"><span class="dot"></span>Runs in your browser. Photos are never uploaded.</p>
+    <h1>Image Format Converter</h1>
+    <p class="lede">Turn photos into JPG, PNG, or WebP so they open on any device or app.</p>
+  </header>
+
+  <section class="bench" aria-label="Converter">
+    <aside class="controls">
+      <div class="step-label"><span class="n">1</span> Choose a format</div>
+      <fieldset>
+        <legend class="sr">Convert to</legend>
+        <div class="seg" role="radiogroup" aria-label="Target format">
+          <input type="radio" name="fmt" id="f-jpg" value="jpg" checked>
+          <label for="f-jpg"><span class="fmt">JPG</span><span class="mime">Works everywhere</span></label>
+          <input type="radio" name="fmt" id="f-png" value="png">
+          <label for="f-png"><span class="fmt">PNG</span><span class="mime">Lossless</span></label>
+          <input type="radio" name="fmt" id="f-webp" value="webp">
+          <label for="f-webp"><span class="fmt">WebP</span><span class="mime">Smallest</span></label>
+        </div>
+        <p class="note" id="fmtNote"></p>
+      </fieldset>
+
+      <div class="step-label"><span class="n">2</span> Fine-tune</div>
+
+      <div class="field" id="qField">
+        <div class="field-head"><label class="field-label" for="qMode">Quality</label><output id="qOut" for="q">Auto</output></div>
+        <select id="qMode">
+          <option value="balanced" selected>Auto: balanced (about 60% of original)</option>
+          <option value="small">Auto: smallest (about 35%)</option>
+          <option value="best">Auto: best looking (not bigger than original)</option>
+          <option value="manual">Manual</option>
+        </select>
+        <input type="range" id="q" min="40" max="100" value="85" disabled>
+        <p class="hint" id="qHint"></p>
+      </div>
+
+      <fieldset class="field trim">
+        <div class="field-head"><legend class="field-label">Trim edges (%)</legend><button type="button" id="trimReset" class="link">Reset</button></div>
+        <div class="trim-grid">
+          <label>Left<input type="number" id="cL" min="0" max="90" value="0" inputmode="numeric"></label>
+          <label>Right<input type="number" id="cR" min="0" max="90" value="0" inputmode="numeric"></label>
+          <label>Top<input type="number" id="cT" min="0" max="90" value="0" inputmode="numeric"></label>
+          <label>Bottom<input type="number" id="cB" min="0" max="90" value="0" inputmode="numeric"></label>
+        </div>
+        <button type="button" id="cropBtn" class="crop-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M2 6h14a2 2 0 0 1 2 2v14"/></svg>
+          Crop
+        </button>
+        <p class="hint">Press Crop and drag the top, bottom, left or right edge. Or type the numbers. 0 keeps the full photo.</p>
+      </fieldset>
+
+      <div class="field">
+        <label class="field-label" for="maxDim">Longest side</label>
+        <select id="maxDim">
+          <option value="0" selected>Keep original size</option>
+          <option value="3840">3840 px (4K)</option>
+          <option value="1920">1920 px (Full HD)</option>
+          <option value="1280">1280 px</option>
+          <option value="800">800 px</option>
+        </select>
+        <p class="hint">Photos are only shrunk, never enlarged.</p>
+      </div>
+
+      <div class="field" id="bgField">
+        <label class="field-label" for="bg">Fill for see-through areas</label>
+        <div class="color-row"><input type="color" id="bg" value="#ffffff"><span class="hint">Used only for JPG.</span></div>
+      </div>
+    </aside>
+
+    <div class="work">
+      <div>
+        <div class="step-label"><span class="n">3</span> Add photos</div>
+        <input class="sr" type="file" id="file" accept="image/*" multiple>
+        <label class="drop" id="drop" for="file">
+          <span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
+          <strong>Drop photos here, or choose files</strong>
+          <span class="sub">JPG, PNG, WebP and other image types. Pick as many as you like.</span>
+        </label>
+      </div>
+
+      <div class="storage" id="summary" hidden>
+        <div class="summary">
+          <div><span class="k">Files</span><span class="v" id="sFiles">0</span></div>
+          <div><span class="k">Before</span><span class="v" id="sBefore">0 KB</span></div>
+          <div><span class="k">After</span><span class="v" id="sAfter">0 KB</span></div>
+          <div><span class="k">Change</span><span class="v" id="sSaved">0%</span></div>
+        </div>
+        <div class="store">
+          <p class="store-title">Storage used <strong id="sFree"></strong></p>
+          <div class="stack"><span class="s-before" id="bBefore"></span><span class="s-after" id="bAfter"></span></div>
+          <p class="legend2"><span class="sw b"></span>Before <span class="sw a"></span>After</p>
+          <p class="hint" id="devStore"></p>
+        </div>
+      </div>
+
+      <div class="head">
+        <h2>Converted <span id="count"></span></h2>
+        <div class="actions">
+          <button type="button" id="zipBtn" class="primary">Download all as ZIP</button>
+          <button type="button" id="clearBtn">Clear</button>
+        </div>
+      </div>
+      <ul id="list"></ul>
+      <p id="status" role="status" aria-live="polite"></p>
+      <p class="foot">Size change compares each new file with the original. A negative number means the new file is smaller. If a download does not appear in your files, use <strong>Open</strong> and press and hold the image to save it.</p>
+    </div>
+  </section>
+</main>
+
+<dialog id="cmp" aria-label="Before and after comparison">
+  <div class="cmp-head"><strong id="cmpTitle">Compare</strong><button type="button" id="cmpClose">Close</button></div>
+  <div class="cmp-stage">
+    <img id="cmpAfter" alt="After">
+    <div class="cmp-top" id="cmpTop"><img id="cmpBefore" alt="Before"></div>
+    <span class="cmp-tag l">Before</span><span class="cmp-tag r">After</span>
+    <div class="cmp-line" id="cmpLine"></div>
+  </div>
+  <input type="range" id="cmpRange" min="0" max="100" value="50" aria-label="Slide to compare before and after">
+  <p class="hint" id="cmpInfo"></p>
+  <div class="fx" id="fx">
+    <p class="fx-title">Improve the “After” side</p>
+    <div class="fx-grid">
+      <div class="fx-item">
+        <div class="field-head"><label class="field-label" for="fxSharp">Unblur (sharpen)</label><output id="fxSharpOut">0</output></div>
+        <input type="range" id="fxSharp" min="0" max="100" value="0">
+      </div>
+      <div class="fx-item">
+        <div class="field-head"><label class="field-label" for="fxColor">Add color (black and white photos)</label></div>
+        <select id="fxColor">
+          <option value="off">Off</option>
+          <option value="natural">Natural warm</option>
+          <option value="sepia">Old photo sepia</option>
+          <option value="cool">Cool blue</option>
+          <option value="sunset">Sunset</option>
+        </select>
+      </div>
+      <div class="fx-item">
+        <div class="field-head"><label class="field-label" for="fxStr">Color strength</label><output id="fxStrOut">80</output></div>
+        <input type="range" id="fxStr" min="0" max="100" value="80">
+      </div>
+    </div>
+    <p class="hint" id="fxHint"></p>
+    <div class="dlg-actions">
+      <button type="button" id="fxReset">Turn off</button>
+      <button type="button" id="fxApply" class="primary">Use for download</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="crop" aria-label="Crop photo">
+  <div class="cmp-head"><strong>Crop photo</strong><button type="button" id="cropClose">Close</button></div>
+  <div class="crop-stage" id="cropStage">
+    <div class="crop-inner" id="cropInner">
+      <canvas id="cropCanvas"></canvas>
+      <div class="crop-clip"><div class="crop-dim" id="cropDim"></div></div>
+      <div class="crop-box" id="cropBox">
+        <span class="h tl" data-h="tl"></span><span class="h t" data-h="t"></span><span class="h tr" data-h="tr"></span>
+        <span class="h l" data-h="l"></span><span class="h r" data-h="r"></span>
+        <span class="h bl" data-h="bl"></span><span class="h b" data-h="b"></span><span class="h br" data-h="br"></span>
+      </div>
+    </div>
+  </div>
+  <p class="hint" id="cropInfo"></p>
+  <div class="dlg-actions">
+    <button type="button" id="cropReset">Reset</button>
+    <button type="button" id="cropApply" class="primary">Apply crop</button>
+  </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
